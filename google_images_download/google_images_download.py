@@ -179,6 +179,11 @@ class googleimagesdownload:
         pass
 
     def _extract_data_pack(self, page):
+        for result in [(m.start(0),m.group(0)) for m in re.finditer('http(s)?:\/\/(?!(www\.)?(gstatic\.com|google\.com))([^\'\"<>]+?)\.(png|jpg|jpeg|gif|bmp)', page)]:
+            start_object = page.rfind('[',0, result[0]-2)
+            end_object = page.find(']',page.find('183836587', result[0]))+1
+            print(page[start_object:end_object])
+            print()
         start_line = page.find("AF_initDataCallback({key: \\'ds:1\\'") - 10
         start_object = page.find('[', start_line + 1)
         end_object = page.find('</script>', start_object + 1) - 5
@@ -196,6 +201,8 @@ class googleimagesdownload:
         return json.loads(lines[3] + lines[4])[0][2]
 
     def _image_objects_from_pack(self, data):
+        '''j = json.loads(data)[31]
+        print(json.dumps(j, indent=4, sort_keys=True))'''
         image_objects = json.loads(data)[31][0][12][2]
         image_objects = [x for x in image_objects if x[0] == 1]
         return image_objects
